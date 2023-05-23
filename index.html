@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>low encode</title>
+  <style>
+    form {
+      width: 800px;
+    }
+
+    p {
+      display: flex;
+      align-items: center;
+      color: #333
+    }
+
+    label {
+      width: 120px;
+      display: inline-block;
+      text-align: right;
+      margin-right: 20px;
+    }
+
+    label::after {
+      content: ':';
+    }
+
+
+    input {
+      width: 600px;
+      line-height: 28px;
+      border-radius: 4px;
+    }
+
+    textarea {
+      width: 600px;
+      min-height: 100px;
+      border-radius: 4px;
+    }
+
+    button {
+      padding: 8px 16px;
+    }
+
+    :required:invalid {
+      border: 1px solid #ff0000;
+    }
+
+    .status {
+      margin-left: 10px;
+    }
+
+    :required:invalid+.status::before {
+      content: '×';
+      color: #ff0000;
+    }
+
+    :required:valid+.status::before {
+      content: '✔️';
+      color: green;
+    }
+
+    .action {
+      display: flex;
+      justify-content: space-evenly;
+    }
+  </style>
+</head>
+
+<body>
+  <form>
+    <p>
+      <label for="key">秘钥</label>
+      <input id="key" type="text" required minlength="4" autofocus>
+      <span class="status"></span>
+    </p>
+    <p>
+      <label for="input">加密字符</label>
+      <textarea id="input" placeholder="请输入需要加密的字符" required></textarea>
+      <span class="status"></span>
+    </p>
+    <p>
+      <label for="result">加密结果</label>
+      <textarea id="result" placeholder="加密结果"></textarea>
+    </p>
+    <p>
+      <label for="revert">解密结果</label>
+      <textarea id="revert" placeholder="解密结果"></textarea>
+    </p>
+    <p class="action"><button id="encode" type="submit">加密</button><button id="decode" type="submit">解密</button></p>
+  </form>
+  <script src="./transformer.js"></script>
+  <script>
+    const $ = document.querySelector.bind(document);
+    const key = $('#key');
+    const input = $('#input');
+    const result = $('#result');
+    const revert = $('#revert');
+    const encode = $('#encode')
+    const decode = $('#decode')
+    encode.addEventListener('click', function (e) {
+      const keyValue = key.value;
+      const inputValue = input.value;
+      try {
+        const transformer = new Transformer(keyValue.split(''));
+        const encoded = transformer.encode(inputValue);
+        result.value = encoded;
+      } catch (e) {
+        return alert(e.message);
+      }
+      e.preventDefault();
+      return false
+    })
+    decode.addEventListener('click', function (e) {
+      const keyValue = key.value;
+      const inputValue = result.value;
+      try {
+        const transformer = new Transformer(keyValue.split(''));
+        const decode = transformer.decode(inputValue);
+        revert.value = decode;
+      } catch (e) {
+        return alert(e.message);
+      }
+      e.preventDefault();
+      return false
+    })
+  </script>
+</body>
+
+</html>
