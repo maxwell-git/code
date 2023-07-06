@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>a screen record example with javascript API</title>
+</head>
+
+<body>
+  <video class="video" width="600px" controls></video>
+  <button class="record-btn">record</button>
+  <script type="text/javascript">
+    const btn = document.querySelector('.record-btn');
+    const video = document.querySelector('video');
+    const mediaSource = new MediaSource();
+    video.src = URL.createObjectURL(mediaSource);
+    btn.addEventListener('click', async () => {
+      let stream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+      const mime = MediaRecorder.isTypeSupported('video/webm;codecs=vp9') ? 'video/webm;codecs=vp9' : 'video/webm';
+      let mediaRecorder = new MediaRecorder(stream, { mimeType: mime });
+      let sourceBuffer = mediaSource.addSourceBuffer(mime);
+      let chunks = [];
+      mediaRecorder.addEventListener('dataavailable', (e) => {
+        chunks.push(e.data);
+        let fileReader = new FileReader();
+        fileReader.onload = function () {
+          sourceBuffer.appendBuffer(fileReader.result);
+        };
+        fileReader.readAsArrayBuffer(e.data);
+        video.play();
+      });
+      mediaRecorder.addEventListener('stop', () => {
+        let blob = new Blob(chunks, { type: chunks[0].type });
+        let url = URL.createObjectURL(blob);
+
+        video.src = url;
+        let a = document.createElement('a');
+        a.href = url;
+        a.download = 'video.webm';
+        a.click();
+      });
+      mediaRecorder.start(16);
+    })
+  </script>
+</body>
+
+</html>
