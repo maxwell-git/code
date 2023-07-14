@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>测试获取文字点阵</title>
+  <style type="text/css">
+    canvas {
+      border: 1px solid deeppink;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="test"></canvas>
+  <hr />
+  <input type="text" id="input" placeholder="请输入中文字">
+  <input type="color" id="color" placeholder="请选择文字的颜色">
+  <script type="text/javascript">
+    const $ = document.querySelector.bind(document);
+    const stage = $('#test');
+    const input = $('#input');
+    const color = $('#color');
+
+    function createChineseDotsData(text) {
+      const canvasDOM = document.createElement("canvas");
+      const ctx = canvasDOM.getContext('2d');
+      const fontSize = 16 * 2;
+      canvasDOM.width = `${fontSize * text.length}`;
+      canvasDOM.height = `${fontSize}`;
+      ctx.imageSmoothingQuality = "high";
+      ctx.font = `normal 100 ${fontSize}px sourceCodePro`;
+      const { width } = ctx.measureText(text);
+      ctx.fillText(text, 0, 14 * 2);
+      ctx.scale(0.5, 0.5)
+      // document.body.appendChild(canvasDOM);
+
+      const { data, width: canvasWidth, height: canvasHeight } = ctx.getImageData(0, 0, width, fontSize);
+      const dots = [];
+      for (let i = 0; i < data.length; i += 4) {
+        const r = data[i];
+        const g = data[i + 1];
+        const b = data[i + 2];
+        const a = data[i + 3];
+        dots.push(a > 0 ? 1 : 0)
+      }
+      // console.log('dots', dots)
+      const result = [];
+      for (let i = 0; i < dots.length; i += canvasWidth) {
+        let col = dots.slice(i, i + canvasWidth);
+        result.push(col);
+      }
+      // console.log('result', result);
+      return { result, width: canvasWidth, height: canvasHeight };
+    }
+
+    function createCanvasStage(stage, data, color = '#000') {
+      const { result, width, height } = data;
+      const context = stage.getContext('2d');
+      stage.width = width * 8;
+      stage.height = height * 8;
+      const RADIUS = 3.4;
+      for (let row = 0; row < result.length; row++) {
+        const cols = result[row];
+        for (let col = 0; col < cols.length; col++) {
+          if (cols[col] === 1) {
+            context.beginPath();
+            context.fillStyle = color;
+            context.arc(col * 2 * (RADIUS + 0.5) + (RADIUS), row * 2 * (RADIUS + 0.5) + (RADIUS), RADIUS, 0, 2 * Math.PI);
+            context.fill();
+            context.closePath();
+          }
+        }
+      }
+    }
+
+    function draw(text, color) {
+      const dots = createChineseDotsData(text);
+      createCanvasStage(stage, dots, color);
+    }
+
+    input.addEventListener('change', function () {
+      const text = this.value;
+      if (!text.trim().length) return;
+      const colorValue = color.value;
+      draw(text, colorValue)
+    });
+
+    color.addEventListener('change', function () {
+      const text = input.value;
+      if (!text.trim().length) return;
+      const colorValue = this.value;
+      draw(text, colorValue);
+    })
+
+    input.value = '完美世界(The perfect world)';
+    input.dispatchEvent(new Event('change'));
+  </script>
+</body>
+
+</html>
