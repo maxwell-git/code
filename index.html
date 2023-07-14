@@ -102,10 +102,10 @@
     const encode = $('#encode')
     const decode = $('#decode')
     encode.addEventListener('click', function (e) {
-      const keyValue = key.value;
+      const [...keyValue] = key.value;
       const inputValue = input.value;
       try {
-        const transformer = new Transformer(keyValue.split(''));
+        const transformer = new Transformer(keyValue);
         const encoded = transformer.encode(inputValue);
         result.value = encoded;
       } catch (e) {
@@ -115,10 +115,10 @@
       return false
     })
     decode.addEventListener('click', function (e) {
-      const keyValue = key.value;
+      const [...keyValue] = key.value;
       const inputValue = result.value;
       try {
-        const transformer = new Transformer(keyValue.split(''));
+        const transformer = new Transformer(keyValue);
         const decode = transformer.decode(inputValue);
         revert.value = decode;
       } catch (e) {
