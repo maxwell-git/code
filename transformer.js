@@ -44,6 +44,6 @@ function test(mapping) {
 }
 
 
-test(['1', 'l', '-', '_', '0', 'o', 'O']);
+// test(['1', 'l', '-', '_', '0', 'o', 'O']);
 
-test('+-x/'.split(''))
+// test('+-x/'.split(''))
