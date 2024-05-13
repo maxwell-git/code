@@ -3,7 +3,7 @@ class Transformer {
     const length = mapping.length;
     if (length < 4) throw new Error('argument mapping must be at least 4 characters!');
     if ([...new Set(mapping)].length < length) throw new Error('mapping should not have same letters!');
-    if(/\p{Emoji}/u.test(mapping)) throw new  Error('emoji is not  supported!');
+    // if(/\p{Emoji}/u.test(mapping)) throw new  Error('emoji is not  supported!');
     this.mapping = mapping;
     this.mapKey = this.mapping.reduce((p, c, i) => { return p[c] = i + '', p }, {});
     this.radix = this.mapping.length;
